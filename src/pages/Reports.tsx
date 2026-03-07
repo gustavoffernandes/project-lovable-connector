@@ -29,6 +29,7 @@ function RiskBadge({ value, type }: { value: number; type: "positive" | "negativ
 }
 
 export default function Reports() {
+  const { isCompanyUser } = useAuth();
   const surveyData = useSurveyData();
   const { isLoading, hasData, companies, respondents, getSectionAverage, getCompanyRespondents, getQuestionAverage, getAvailableSections, getAvailableQuestions, getAnswerDistribution, getOutlierResponses, getSectorAverages } = surveyData;
   const [selectedCompany, setSelectedCompany] = useState<string>("");
