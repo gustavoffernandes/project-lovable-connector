@@ -13,7 +13,7 @@ import { Loader2 } from "lucide-react";
 const COLORS = ["hsl(217, 71%, 45%)", "hsl(170, 60%, 45%)", "hsl(38, 92%, 55%)", "hsl(280, 60%, 55%)", "hsl(0, 72%, 55%)", "hsl(200, 80%, 50%)"];
 
 export default function CompanyComparison() {
-  const { isLoading, hasData, companies, respondents, getSectionAverage, getCompanyRespondents, getAvailableSections, getSectorAverages } = useSurveyData();
+  const { isCompanyUser } = useAuth();
   const [selected, setSelected] = useState<string[]>([]);
   const [compareMode, setCompareMode] = useState<"company" | "sector">("company");
   const [sectorCompanyId, setSectorCompanyId] = useState<string>("");
