@@ -3,14 +3,16 @@ import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 
-export type AppRole = "admin" | "user";
+export type AppRole = "admin" | "user" | "company_user";
 
 interface AuthContextType {
   user: User | null;
   session: Session | null;
   role: AppRole | null;
+  userCompanyId: string | null;
   loading: boolean;
   isAdmin: boolean;
+  isCompanyUser: boolean;
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
@@ -21,15 +23,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [role, setRole] = useState<AppRole | null>(null);
+  const [userCompanyId, setUserCompanyId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchRole = async (userId: string): Promise<AppRole | null> => {
+  const fetchRole = async (userId: string): Promise<{ role: AppRole; companyId: string | null }> => {
     const { data } = await supabase
       .from("user_roles")
-      .select("role")
+      .select("role, company_id")
       .eq("user_id", userId)
       .maybeSingle();
-    return (data?.role as AppRole) ?? "user";
+    return {
+      role: (data?.role as AppRole) ?? "user",
+      companyId: (data as any)?.company_id ?? null,
+    };
   };
 
   useEffect(() => {
@@ -43,11 +49,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (session?.user) {
           setTimeout(async () => {
-            const userRole = await fetchRole(session.user.id);
-            if (isMounted) setRole(userRole);
+            const result = await fetchRole(session.user.id);
+            if (isMounted) {
+              setRole(result.role);
+              setUserCompanyId(result.companyId);
+            }
           }, 0);
         } else {
           setRole(null);
+          setUserCompanyId(null);
         }
       }
     );
@@ -61,8 +71,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setUser(session?.user ?? null);
 
         if (session?.user) {
-          const userRole = await fetchRole(session.user.id);
-          if (isMounted) setRole(userRole);
+          const result = await fetchRole(session.user.id);
+          if (isMounted) {
+            setRole(result.role);
+            setUserCompanyId(result.companyId);
+          }
         }
       } finally {
         if (isMounted) setLoading(false);
@@ -84,6 +97,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     setRole(null);
+    setUserCompanyId(null);
     await supabase.auth.signOut();
   }, []);
 
@@ -116,8 +130,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       user,
       session,
       role,
+      userCompanyId,
       loading,
       isAdmin: role === "admin",
+      isCompanyUser: role === "company_user",
       signIn,
       signOut,
     }}>
