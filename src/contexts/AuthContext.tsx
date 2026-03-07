@@ -29,12 +29,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const fetchRole = async (userId: string): Promise<{ role: AppRole; companyId: string | null }> => {
     const { data } = await supabase
       .from("user_roles")
-      .select("role, company_id")
+      .select("role")
       .eq("user_id", userId)
       .maybeSingle();
+    
+    // company_id is not yet in generated types, fetch separately
+    const { data: fullData } = await supabase
+      .from("user_roles")
+      .select("*")
+      .eq("user_id", userId)
+      .maybeSingle();
+    
     return {
       role: (data?.role as AppRole) ?? "user",
-      companyId: (data as any)?.company_id ?? null,
+      companyId: (fullData as any)?.company_id ?? null,
     };
   };
 
