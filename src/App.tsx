@@ -40,6 +40,7 @@ const App = () => (
             <Route path="/heatmap" element={<ProtectedRoute><Heatmap /></ProtectedRoute>} />
             <Route path="/evolucao" element={<ProtectedRoute><TemporalEvolution /></ProtectedRoute>} />
             <Route path="/relatorios" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/empresas-cadastro" element={<ProtectedRoute requireAdmin><Companies /></ProtectedRoute>} />
             <Route path="/integracoes" element={<ProtectedRoute requireAdmin><GoogleSheetsConfig /></ProtectedRoute>} />
             <Route path="/notas" element={<ProtectedRoute><CompanyNotes /></ProtectedRoute>} />
             <Route path="/plano-acao" element={<ProtectedRoute><ActionPlans /></ProtectedRoute>} />
