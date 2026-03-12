@@ -19,6 +19,7 @@ import NotFound from "./pages/NotFound";
 import CompanyNotes from "./pages/CompanyNotes";
 import ActionPlans from "./pages/ActionPlans";
 import TemporalEvolution from "./pages/TemporalEvolution";
+import Companies from "./pages/Companies";
 
 const queryClient = new QueryClient();
 
